@@ -3,6 +3,8 @@
 
 if [ -f "openhpc.conf" ]; then
 	. openhpc.conf
+elif [ -f "/data/openhpc.conf" ]; then
+	. /data/openhpc.conf
 else
 	echo "Unable to find ./openhpc.conf exiting"
 	exit 1
@@ -21,10 +23,13 @@ if [ ! -f "$HOME/rpmbuild/RPMS/x86_64/warewulf-$ww_version-1.el9.x86_64.rpm" ]; 
   if [ -d "$PWD/warewulf-$ww_version" ]; then
     rm -fr $PWD/warewulf-$ww_version
   fi
+  rm /etc/yum.repos.d/*.repo
+  cp /data/repos/*.repo /etc/yum.repos.d/
+  yum clean all
+  dnf install 'dnf-command(config-manager)' -y
   dnf config-manager --set-enabled crb
   yum update -y
-
-  dnf -y install golang rpmdevtools gpgme-devel libassuan-devel
+  dnf -y install golang rpmdevtools gpgme-devel libassuan-devel wget firewalld-filesystem systemd git
 
   rpmdev-setuptree
 
@@ -43,9 +48,9 @@ if [ ! -f "$HOME/rpmbuild/RPMS/x86_64/warewulf-$ww_version-1.el9.x86_64.rpm" ]; 
   cd ..
 
   rpmbuild -bb /root/rpmbuild/SPECS/warewulf.spec
-  cp /root/rpmbuild/RPMS/x86_64/warewulf-$ww_version-1.el9.x86_64.rpm $HOME
+  cp /root/rpmbuild/RPMS/x86_64/warewulf-$ww_version-1.el9.x86_64.rpm /data/
 
-  echo "warewulf-$ww_version-1.el9.x86_64.rpm can be found in $HOME"
+  echo "warewulf-$ww_version-1.el9.x86_64.rpm can be found in $PWD"
 else
   echo "Warewulf already compliled in $HOME/rpmbuild/RPMS/x86_64/"
   echo 

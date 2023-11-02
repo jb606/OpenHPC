@@ -1,0 +1,4 @@
+settings.json
+*.repo
+*.rpm
+hpc-for-the-rest-of-us/ansible/inventory.yml

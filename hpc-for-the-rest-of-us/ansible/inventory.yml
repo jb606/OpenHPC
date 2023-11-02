@@ -1,7 +1,0 @@
----
-LoginNodes:
-  hosts:
-    bmw-login1:
-      ansible_host: 172.16.161.25
-      
-

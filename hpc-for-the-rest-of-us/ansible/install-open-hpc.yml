@@ -7,19 +7,43 @@
   vars:
     ohpc_version: "3"
     ohpc_rev: "1"
+
   tasks:
     - name: Disable stop and disable firewalld
       ansible.builtin.systemd_service:
         state: stopped
         enabled: false
         name: firewalld
+    - name: Uploading Wareulf RPM
+      ansible.builtin.copy:
+        src: files/warewulf-4.4.1-1.el9.x86_64.rpm
+        dest: /tmp/warewulf-4.4.1-1.el9.x86_64.rpm
+        owner: root
+        group: root
+        mode: '644'
     - name: Installing OpenHPC-3 GPG Key
       ansible.builtin.rpm_key:
         state: present
         key: https://raw.githubusercontent.com/openhpc/ohpc/8b0fbb5ec130cb949900aca73e2f27a9b4113ced/components/admin/ohpc-release/SOURCES/RPM-GPG-KEY-OpenHPC-3
-    - name: Install the OpenHPC Repo
+    - name: Install the OpenHPC and EPEL Repos
       ansible.builtin.yum:
         name:
           - epel-release
           - 'http://repos.openhpc.community/OpenHPC/{{ ohpc_version }}/EL_9/x86_64/ohpc-release-{{ ohpc_version }}-{{ ohpc_rev }}.el9.x86_64.rpm'
+          - dnf-plugins-core
         state: present
+    - name: Installing Wareulf
+      ansible.builtin.yum:
+        disable_gpg_check: true
+        name:
+          - /tmp/warewulf-4.4.1-1.el9.x86_64.rpm
+    - name: Enable CRB Repos
+      ansible.builtin.dnf:
+        enablerepo:
+          - crb
+    - name: Installing OpenHPC RPS
+      ansible.builtin.yum:
+        update_cache: true
+        name:
+          - ohpc-base
+          - ohpc-slurm-server
