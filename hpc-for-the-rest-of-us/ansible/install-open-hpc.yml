@@ -9,6 +9,13 @@
     ohpc_rev: "1"
 
   tasks:
+    - name: Login node network string fact
+      ansible.builtin.set_fact:
+        sms_netstr: "{{ hostvars[inventory_hostname].sms_ip }}/{{ hostvars[inventory_hostname].internal_netmask }}"
+    - name: Calculating network prefix from network mask
+      ansible.builtin.set_fact:
+        sms_prefix: "{{ sms_netstr | ansible.utils.ipaddr('prefix') }}"
+
     - name: Disable stop and disable firewalld
       ansible.builtin.systemd_service:
         state: stopped
