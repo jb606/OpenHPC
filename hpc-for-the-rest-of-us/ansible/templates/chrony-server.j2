@@ -1,0 +1,19 @@
+# These servers were defined in the installation:
+server {{ hostvars[inventory_hostname].sms_ip }} iburst
+
+driftfile /var/lib/chrony/drift
+
+makestep 1.0 3
+
+rtcsync
+
+allow {{ hostvars[inventory_hostname].sms_network }}/{{ sms_prefix }}
+
+local stratum 10
+
+
+keyfile /etc/chrony.keys
+ntsdumpdir /var/lib/chrony
+leapsectz right/UTC
+logdir /var/log/chrony
+

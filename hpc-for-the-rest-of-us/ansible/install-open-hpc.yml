@@ -7,9 +7,10 @@
   vars:
     ohpc_version: "3"
     ohpc_rev: "1"
+    chrony_template: "templates/chrony-server.j2"
 
   tasks:
-    - name: Login node network string fact
+    - name: Setting login node network string fact
       ansible.builtin.set_fact:
         sms_netstr: "{{ hostvars[inventory_hostname].sms_ip }}/{{ hostvars[inventory_hostname].internal_netmask }}"
     - name: Calculating network prefix from network mask
@@ -54,3 +55,10 @@
         name:
           - ohpc-base
           - ohpc-slurm-server
+    - name: Setting up Chrony
+      ansible.builtin.template:
+        src: "{{ chrony_template }}"
+        dest: /etc/chrony.conf
+        mode: '640'
+        owner: root
+        group: chrony
